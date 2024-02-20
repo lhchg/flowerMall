@@ -71,13 +71,13 @@
                         <ul class="dropdown-menu dropdown-messages">
                             <li>
                                 <div class="dropdown-messages-box">
-                                    姓名：{{ current_user.nickname }} <a href="{{ buildUrl('/user/edit') }}" class="pull-right">编辑</a>
+                                    姓名：xxxx <a href="{{ buildUrl('/user/edit') }}" class="pull-right">编辑</a>
                                 </div>
                             </li>
                             <li class="divider"></li>
                             <li>
                                 <div class="dropdown-messages-box">
-                                    手机号码：{{ current_user.mobile }}
+                                    手机号码：xxxx
                                 </div>
                             </li>
                             <li class="divider"></li>
@@ -101,10 +101,7 @@
         {% block content %}{% endblock %}
     </div>
 </div>
-<div class="hidden hidden_layout_wrap">
-    <input name="domain" value="{{ config.APP.domain }}">
-    <input name="prefix_url" value="{{ config.UPLOAD.prefix_url }}">
-</div>
+
 <script src="{{ buildStaticUrl('/plugins/jquery-2.1.1.js') }}"></script>
 <script src="{{ buildStaticUrl('/bootstrap/bootstrap.min.js') }}"></script>
 <script src="{{ buildStaticUrl('/plugins/layer/layer.js') }}"></script>
