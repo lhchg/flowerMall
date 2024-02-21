@@ -77,10 +77,38 @@ def edit():
     return json.dumps(resp, ensure_ascii=False)
 
 
-@route_user.route("/reset-pwd")
+@route_user.route("/reset-pwd", methods=["POST", "GET"])
 def resetPwd():
-    return ops_render("user/reset_pwd.html")
+    if request.method == "GET":
+        return ops_render("user/reset_pwd.html")
 
+    resp = {'code': 200, 'msg': '操作成功', 'data': {}}
+    req = request.values
+    old_password = req['old_password'] if 'old_password' in req else ""
+    new_password = req['new_password'] if 'new_password' in req else ""
+
+    if old_password is None or len(old_password) < 6:
+        resp['code'] = -1
+        resp['msg'] = "请输入符合规范的原密码"
+        return json.dumps(resp, ensure_ascii=False)
+
+    if new_password is None or len(new_password) < 6:
+        resp['code'] = -1
+        resp['msg'] = "请输入符合规范的新密码"
+        return json.dumps(resp, ensure_ascii=False)
+
+    if old_password == new_password:
+        app.logger.info("same")
+        resp['code'] = -1
+        resp['msg'] = "请重新输入一个，新密码与原密码不能相同"
+        return json.dumps(resp, ensure_ascii=False)
+
+    user_info = g.current_user
+    user_info.login_pwd = UserService.genPwd(new_password, user_info.login_salt)
+
+    db.session.add(user_info)
+    db.session.commit()
+    return json.dumps(resp, ensure_ascii=False)
 
 @route_user.route("/logout")
 def logout():
