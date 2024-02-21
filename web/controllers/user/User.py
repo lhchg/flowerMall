@@ -42,7 +42,7 @@ def login():
         return json.dumps(resp, ensure_ascii=False)
 
     reponse = make_response(json.dumps(resp))
-    reponse.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" %(UserService.geneAuthCode(user_info), user_info.uid))
+    reponse.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
 
     return reponse
 
@@ -55,6 +55,7 @@ def edit():
 @route_user.route("/reset-pwd")
 def resetPwd():
     return render_template("user/reset_pwd.html")
+
 
 @route_user.route("/logout")
 def logout():
