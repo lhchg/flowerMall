@@ -22,9 +22,14 @@ var user_login_ops={
                 data:{'login_name':login_name, 'login_pwd':login_pwd},
                 dataType:'json',
                 success:function(res){
-
+                    var callback = null;
+                    if (res.code == 200) {
+                        callback = function() {
+                            window.location.href = common_ops.buildUrl("/");
+                        }
+                    }
+                    common_ops.alert( res.msg, callback)
                 }
-
             });
         });
     }
