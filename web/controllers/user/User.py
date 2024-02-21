@@ -43,7 +43,8 @@ def login():
         return json.dumps(resp, ensure_ascii=False)
 
     response = make_response(json.dumps(resp))
-    response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
+    response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" %
+                        (UserService.geneAuthCode(user_info), user_info.uid), 60*60*24*120)
 
     return response
 
@@ -108,7 +109,12 @@ def resetPwd():
 
     db.session.add(user_info)
     db.session.commit()
-    return json.dumps(resp, ensure_ascii=False)
+
+    response = make_response(json.dumps(resp))
+    response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" %
+                        (UserService.geneAuthCode(user_info), user_info.uid), 60*60*24*120)
+
+    return response
 
 @route_user.route("/logout")
 def logout():
