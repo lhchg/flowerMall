@@ -1,0 +1,10 @@
+import base64, hashlib
+
+
+class UserService():
+    @staticmethod
+    def genPwd(pwd, salt):
+        m = hashlib.md5()
+        str = "%s-%s" % (base64.encodebytes(pwd.encode("utf-8")), salt)
+        m.update(str.encode("utf-8"))
+        return m.hexdigest()
