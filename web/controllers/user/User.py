@@ -41,10 +41,10 @@ def login():
         resp['msg'] = "请输入正确的用户名和密码"
         return json.dumps(resp, ensure_ascii=False)
 
-    reponse = make_response(json.dumps(resp))
-    reponse.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
+    response = make_response(json.dumps(resp))
+    response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
 
-    return reponse
+    return response
 
 
 @route_user.route("/edit")
