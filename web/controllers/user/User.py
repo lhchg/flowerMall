@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, request, jsonify, json
+from flask import Blueprint, render_template, request, jsonify, make_response
+import json
 from common.models.User import User
 from common.libs.user.UserService import UserService
+from application import app
 
 route_user = Blueprint('user_page', __name__)
 
@@ -38,7 +40,10 @@ def login():
         resp['msg'] = "请输入正确的用户名和密码"
         return json.dumps(resp, ensure_ascii=False)
 
-    return json.dumps(resp, ensure_ascii=False)
+    reponse = make_response(json.dumps(resp))
+    reponse.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" %(UserService.geneAuthCode(user_info), user_info.uid))
+
+    return reponse
 
 
 @route_user.route("/edit")
