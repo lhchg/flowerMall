@@ -53,7 +53,7 @@ def login():
 @route_user.route("/edit", methods=["POST", "GET"])
 def edit():
     if request.method == "GET":
-        return ops_render("user/edit.html")
+        return ops_render("user/edit.html", {'current': 'edit'})
 
     resp = {'code': 200, 'msg': '操作成功', 'data': {}}
     req = request.values
@@ -87,7 +87,7 @@ def edit():
 @route_user.route("/reset-pwd", methods=["POST", "GET"])
 def resetPwd():
     if request.method == "GET":
-        return ops_render("user/reset_pwd.html")
+        return ops_render("user/reset_pwd.html", {'current': 'reset-pwd'})
 
     resp = {'code': 200, 'msg': '操作成功', 'data': {}}
     req = request.values
