@@ -18,14 +18,15 @@ def index():
     req = request.values
 
     page = int(req['p']) if ('p' in req and req['p']) else 1
+    query = User.query
 
     if 'mix_kw' in req:
         rule = or_(User.nickname.ilike("%{0}%".format(req['mix_kw'])),
                    User.mobile.ilike("%{0}%".format(req['mix_kw'])))
-        User.query = User.query.filter(rule)
+        query = User.query.filter(rule)
 
     page_params = {
-        'total': User.query.count(),
+        'total': query.count(),
         'page_size': app.config['PAGE_SIZE'],
         'page': page,
         'display': app.config['PAGE_DISPLAY'],
@@ -36,7 +37,7 @@ def index():
     offset = (page - 1) * app.config['PAGE_SIZE']
     limit = app.config['PAGE_SIZE'] * page
 
-    usr_list = User.query.order_by(User.uid.desc()).all()[offset:limit]
+    usr_list = query.order_by(User.uid.desc()).all()[offset:limit]
     resp_data['list'] = usr_list
     resp_data['pages'] = pages
 
