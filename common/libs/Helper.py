@@ -1,4 +1,5 @@
 from flask import g, render_template
+import datetime
 
 
 def iPagination(params):
@@ -55,3 +56,7 @@ def ops_render(template, context=None):
         context['current_user'] = g.current_user
 
     return render_template(template, **context)
+
+
+def getCurrentDate(format="%Y-%m-%d %H:%M:%S"):
+    return datetime.datetime.now().strftime(format)
