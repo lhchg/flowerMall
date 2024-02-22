@@ -6,6 +6,7 @@ from common.libs.user.UserService import UserService
 from application import app, db
 from common.libs.UrlManager import UrlManager
 from common.libs.Helper import ops_render
+import datetime
 
 route_user = Blueprint('user_page', __name__)
 
@@ -44,7 +45,7 @@ def login():
 
     response = make_response(json.dumps(resp))
     response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" %
-                        (UserService.geneAuthCode(user_info), user_info.uid), 60*60*24*120)
+                        (UserService.geneAuthCode(user_info), user_info.uid), 60 * 60 * 24 * 120)
 
     return response
 
@@ -72,6 +73,11 @@ def edit():
     user_info = g.current_user
     user_info.nickname = nickname
     user_info.email = email
+
+    current_time = datetime.datetime.now()
+    time_string = current_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    user_info.updated_time = time_string
 
     db.session.add(user_info)
     db.session.commit()
@@ -114,14 +120,19 @@ def resetPwd():
 
     user_info.login_pwd = UserService.genPwd(new_password, user_info.login_salt)
 
+    current_time = datetime.datetime.now()
+    time_string = current_time.strftime('%Y-%m-%d %H:%M:%S')
+    user_info.updated_time = time_string
+
     db.session.add(user_info)
     db.session.commit()
 
     response = make_response(json.dumps(resp))
     response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" %
-                        (UserService.geneAuthCode(user_info), user_info.uid), 60*60*24*120)
+                        (UserService.geneAuthCode(user_info), user_info.uid), 60 * 60 * 24 * 120)
 
     return response
+
 
 @route_user.route("/logout")
 def logout():
