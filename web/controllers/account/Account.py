@@ -25,6 +25,10 @@ def index():
                    User.mobile.ilike("%{0}%".format(req['mix_kw'])))
         query = User.query.filter(rule)
 
+    if 'status' in req and int (req['status']) > -1:
+        query = query.filter(User.status == int(req['status']))
+
+
     page_params = {
         'total': query.count(),
         'page_size': app.config['PAGE_SIZE'],
