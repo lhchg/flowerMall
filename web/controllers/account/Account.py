@@ -7,6 +7,7 @@ from common.models.User import User
 from common.libs.UrlManager import UrlManager
 from common.libs.user.UserService import UserService
 from application import app, db
+from sqlalchemy import or_
 
 route_account = Blueprint('account_page', __name__)
 
@@ -17,6 +18,11 @@ def index():
     req = request.values
 
     page = int(req['p']) if ('p' in req and req['p']) else 1
+
+    if 'mix_kw' in req:
+        rule = or_(User.nickname.ilike("%{0}%".format(req['mix_kw'])),
+                   User.mobile.ilike("%{0}%".format(req['mix_kw'])))
+        User.query = User.query.filter(rule)
 
     page_params = {
         'total': User.query.count(),
