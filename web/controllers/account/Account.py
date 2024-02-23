@@ -4,6 +4,7 @@ import json
 from flask import Blueprint, request, redirect
 from common.libs.Helper import ops_render, iPagination, getCurrentDate
 from common.models.User import User
+from common.models.log.AppAccessLog import AppAccessLog
 from common.libs.UrlManager import UrlManager
 from common.libs.user.UserService import UserService
 from application import app, db
@@ -61,12 +62,15 @@ def info():
         return redirect(reback_url)
 
     info = User.query.filter_by(uid=uid).first()
+
     if not info:
         return redirect(reback_url)
 
+    access_list = AppAccessLog.query.filter_by(uid=uid).order_by(AppAccessLog.id.desc()).limit(10).all()
+    resp_data['access_info'] = access_list
     resp_data['info'] = info
-
     return ops_render("account/info.html", resp_data)
+
 
 
 @route_account.route("/set", methods=['GET', 'POST'])
