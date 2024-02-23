@@ -43,6 +43,11 @@ def login():
         resp['msg'] = "请输入正确的用户名和密码"
         return json.dumps(resp, ensure_ascii=False)
 
+    if user_info.status != 1:
+        resp['code'] = -1
+        resp['msg'] = "账号已被禁用，请联系管理员处理"
+        return json.dumps(resp, ensure_ascii=False)
+
     response = make_response(json.dumps(resp))
     response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" %
                         (UserService.geneAuthCode(user_info), user_info.uid), 60 * 60 * 24 * 120)
