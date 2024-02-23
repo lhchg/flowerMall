@@ -1,4 +1,5 @@
 from web.interceptors.AutoInterceptor import *
+from web.interceptors.ErrorInterceptor import *
 
 from web.controllers.index import route_index
 from web.controllers.static import route_static
