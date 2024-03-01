@@ -6,7 +6,8 @@ SQLALCHEMY_ECHO = False
 AUTH_COOKIE_NAME = "food"
 
 IGNORE_URL = [
-    "^/user/login"
+    "^/user/login",
+    "^/api"
 ]
 
 IGNORE_CHECK_LOGIN_URLS = [
@@ -20,4 +21,9 @@ PAGE_DISPLAY = 10
 STATUS_MAPPING = {
     '1': '正常',
     '0': '已删除'
+}
+
+MINA_APP = {
+    'appid': "wx99713f08b416468f",
+    'appkey': ''
 }
