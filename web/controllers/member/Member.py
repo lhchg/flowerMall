@@ -82,7 +82,7 @@ def set():
 
         return ops_render("member/set.html", resp_data)
 
-    resp = {"code":200, "msg":"操作成功", "data":{}}
+    resp = {"code": 200, "msg": "操作成功", "data": {}}
     req = request.values
     id = req["id"] if "id" in req else 0
     nickname = req["nickname"] if "nickname" in req else ""
@@ -104,6 +104,43 @@ def set():
     db.session.commit()
     return json.dumps(resp, ensure_ascii=False)
 
+
 @route_member.route("/comment")
 def comment():
     return ops_render("member/comment.html")
+
+
+
+@route_member.route("/ops", methods=["POST", "GET"])
+def ops():
+    resp = {'code': 200, 'msg': "操作成功", 'data': {}}
+    req = request.values
+
+    id = req['id'] if 'id' in req else 0
+    act = req['act'] if 'act' in req else ''
+
+    if not id:
+        resp['code'] = -1
+        resp['msg'] = "请选择要操作的账号"
+
+    if act not in ["remove", "recover"]:
+        resp['code'] = -1
+        resp['msg'] = "操作有误，请重试"
+        return json.dumps(resp, ensure_ascii=False)
+
+    member_info = Member.query.filter_by(id=id).first()
+    if not member_info:
+        resp['code'] = -1
+        resp['msg'] = "指定会员不存在"
+        return json.dumps(resp, ensure_ascii=False)
+
+    if act == "remove":
+        member_info.status = 0
+    elif act == "recover":
+        app.logger.info("###############################")
+        member_info.status = 1
+
+    member_info.updated_time = getCurrentDate()
+    db.session.add(member_info)
+    db.session.commit()
+    return json.dumps(resp, ensure_ascii=False)
