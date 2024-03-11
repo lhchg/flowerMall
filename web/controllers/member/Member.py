@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, request
-from common.libs.Helper import ops_render, iPagination
+import json
+
+from flask import Blueprint, request, redirect
+from common.libs.Helper import ops_render, iPagination, getCurrentDate
+from common.libs.UrlManager import UrlManager
 from common.models.member.Member import Member
-from application import app
+from application import app, db
 
 route_member = Blueprint('member_page', __name__)
 
@@ -44,14 +47,100 @@ def index():
 
 @route_member.route("/info")
 def info():
-    return ops_render("member/info.html")
+    resp_data = {}
+    req = request.args
+    id = int(req.get('id', 0))
+    reback_url = UrlManager.buildUrl("/member/index")
+    if id < 1:
+        return redirect(reback_url)
+
+    info = Member.query.filter_by(id=id).first()
+    if not info:
+        return redirect(reback_url)
+
+    resp_data['info'] = info
+    resp_data['current'] = 'index'
+    return ops_render("member/info.html", resp_data)
 
 
-@route_member.route("/set")
+@route_member.route("/set", methods=["GET", "POST"])
 def set():
-    return ops_render("member/set.html")
+    reback_url = UrlManager.buildUrl("/member/index")
+    if request.method == "GET":
+        resp_data = {}
+        req = request.args
+        id = int(req.get('id', 0))
+        if id < 1:
+            return redirect(reback_url)
+
+        info = Member.query.filter_by(id=id).first()
+        if not info:
+            return redirect(reback_url)
+
+        resp_data["info"] = info
+        resp_data["current"] = "index"
+
+        return ops_render("member/set.html", resp_data)
+
+    resp = {"code": 200, "msg": "操作成功", "data": {}}
+    req = request.values
+    id = req["id"] if "id" in req else 0
+    nickname = req["nickname"] if "nickname" in req else ""
+    if nickname is None or len(nickname) < 1:
+        resp["code"] = -1
+        resp["msg"] = "请输入符合规范的姓名"
+
+        return json.dumps(resp, ensure_ascii=False)
+
+    member_info = Member.query.filter_by(id=id).first()
+    if not member_info:
+        resp["code"] = -1
+        resp["msg"] = "指定会员不存在"
+        return json.dumps(resp, ensure_ascii=False)
+
+    member_info.nickname = nickname
+    member_info.updated_time = getCurrentDate()
+    db.session.add(member_info)
+    db.session.commit()
+    return json.dumps(resp, ensure_ascii=False)
 
 
 @route_member.route("/comment")
 def comment():
     return ops_render("member/comment.html")
+
+
+
+@route_member.route("/ops", methods=["POST", "GET"])
+def ops():
+    resp = {'code': 200, 'msg': "操作成功", 'data': {}}
+    req = request.values
+
+    id = req['id'] if 'id' in req else 0
+    act = req['act'] if 'act' in req else ''
+
+    if not id:
+        resp['code'] = -1
+        resp['msg'] = "请选择要操作的账号"
+
+    if act not in ["remove", "recover"]:
+        resp['code'] = -1
+        resp['msg'] = "操作有误，请重试"
+        return json.dumps(resp, ensure_ascii=False)
+
+    member_info = Member.query.filter_by(id=id).first()
+    if not member_info:
+        resp['code'] = -1
+        resp['msg'] = "指定会员不存在"
+        return json.dumps(resp, ensure_ascii=False)
+
+    if act == "remove":
+        member_info.status = 0
+    elif act == "recover":
+        app.logger.info("###############################")
+        member_info.status = 1
+
+    member_info.updated_time = getCurrentDate()
+    db.session.add(member_info)
+    db.session.commit()
+    return json.dumps(resp, ensure_ascii=False)
